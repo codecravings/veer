@@ -53,3 +53,68 @@ class _RootScreenState extends State<RootScreen> with SingleTickerProviderStateM
   Set<String> _doneSnapshot = {};
   List<String> _newly = [];
 
+  @override
+  void initState() {
+    super.initState();
+    game = VeerGame(widget.rec)..onDeath = _onDeath;
+    game.goReady();
+    _ticker = createTicker(_tick)..start();
+  }
+
+  void _tick(Duration elapsed) {
+    double dt = _last == Duration.zero ? 0.016 : (elapsed - _last).inMicroseconds / 1e6;
+    _last = elapsed;
+    if (dt > 0.05) dt = 0.05;
+    game.update(dt);
+  }
+
+  void _onDeath() {
+    HapticFeedback.heavyImpact();
+    final now = kChallenges.where((c) => c.done(widget.rec)).map((c) => c.name).toSet();
+    setState(() => _newly = now.difference(_doneSnapshot).toList());
+  }
+
+  void _start(bool daily) {
+    _doneSnapshot = kChallenges.where((c) => c.done(widget.rec)).map((c) => c.name).toSet();
+    _newly = [];
+    _lastDaily = daily;
+    setState(() => _showChallenges = false);
+    HapticFeedback.mediumImpact();
+    game.startRun(daily: daily);
+  }
+
+  void _flip() {
+    if (game.phase != Phase.play) return;
+    HapticFeedback.selectionClick();
+    game.tap();
+  }
+
+  @override
+  void dispose() {
+    _ticker.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final pad = MediaQuery.of(context).padding;
+    return Scaffold(
+      body: Stack(
+        children: [
+          Positioned.fill(
+            child: GestureDetector(
+              behavior: HitTestBehavior.opaque,
+              onTapDown: (_) => _flip(),
+              child: CustomPaint(painter: VeerPainter(game), child: const SizedBox.expand()),
+            ),
+          ),
+          AnimatedBuilder(
+            animation: game,
+            builder: (context, _) => _overlays(pad),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _overlays(EdgeInsets pad) {
