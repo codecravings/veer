@@ -348,3 +348,82 @@ class _RootScreenState extends State<RootScreen> with SingleTickerProviderStateM
                       fontSize: 17, fontWeight: FontWeight.w800, color: Colors.white)),
             ),
             if (done)
+              Icon(Icons.check_circle, color: amber, size: 22)
+            else
+              Text('$cur/${c.goal}',
+                  style: TextStyle(color: Colors.white.withOpacity(0.6), fontSize: 13)),
+          ]),
+          const SizedBox(height: 4),
+          Text(c.desc,
+              style: TextStyle(fontSize: 13, color: Colors.white.withOpacity(0.55))),
+          const SizedBox(height: 10),
+          ClipRRect(
+            borderRadius: BorderRadius.circular(6),
+            child: Stack(children: [
+              Container(height: 6, color: Colors.white.withOpacity(0.07)),
+              FractionallySizedBox(
+                widthFactor: prog,
+                child: Container(
+                    height: 6,
+                    decoration: BoxDecoration(
+                        gradient: LinearGradient(colors: [col.withOpacity(0.6), col]))),
+              ),
+            ]),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // ---------- shared widgets ----------
+  Widget _bigButton(String label, Color color, VoidCallback onTap,
+      {bool filled = true, bool dim = false}) {
+    return GestureDetector(
+      onTap: () {
+        HapticFeedback.selectionClick();
+        onTap();
+      },
+      child: Container(
+        height: 62,
+        alignment: Alignment.center,
+        decoration: BoxDecoration(
+          gradient: filled
+              ? LinearGradient(colors: [color.withOpacity(0.9), color.withOpacity(0.65)])
+              : null,
+          color: filled ? null : Colors.white.withOpacity(dim ? 0.03 : 0.06),
+          borderRadius: BorderRadius.circular(18),
+          border: Border.all(color: color.withOpacity(filled ? 0 : 0.4), width: 1.4),
+          boxShadow: filled
+              ? [BoxShadow(color: color.withOpacity(0.5), blurRadius: 24, spreadRadius: -4)]
+              : null,
+        ),
+        child: Text(label,
+            style: TextStyle(
+                fontSize: 19,
+                fontWeight: FontWeight.w800,
+                letterSpacing: 2,
+                color: filled ? const Color(0xFF05060C) : color)),
+      ),
+    );
+  }
+
+  Widget _statChip(String label, String value) {
+    return Column(children: [
+      Text(label,
+          style:
+              TextStyle(fontSize: 12, letterSpacing: 3, color: Colors.white.withOpacity(0.45))),
+      const SizedBox(height: 2),
+      Text(value,
+          style: const TextStyle(fontSize: 30, fontWeight: FontWeight.w800, color: Colors.white)),
+    ]);
+  }
+
+  Widget _miniStat(String label, String value) {
+    return Column(children: [
+      Text(value,
+          style: const TextStyle(fontSize: 22, fontWeight: FontWeight.w800, color: Colors.white)),
+      Text(label,
+          style: TextStyle(fontSize: 11, letterSpacing: 2, color: Colors.white.withOpacity(0.5))),
+    ]);
+  }
+}
