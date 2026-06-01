@@ -173,3 +173,58 @@ class _RootScreenState extends State<RootScreen> with SingleTickerProviderStateM
                   color: c,
                   shadows: [Shadow(color: c, blurRadius: 24)])),
           Text(game.bannerSub.toUpperCase(),
+              style: TextStyle(
+                  fontSize: 13, letterSpacing: 3, color: Colors.white.withOpacity(0.7))),
+        ],
+      ),
+    );
+  }
+
+  // ---------- HOME ----------
+  Widget _homePanel(EdgeInsets pad) {
+    final r = widget.rec;
+    return Container(
+      color: Colors.black.withOpacity(0.28),
+      padding: EdgeInsets.fromLTRB(28, pad.top + 40, 28, pad.bottom + 28),
+      child: Column(
+        children: [
+          const Spacer(flex: 2),
+          _logo(),
+          const SizedBox(height: 8),
+          Text('P O L A R I T Y',
+              style: TextStyle(
+                  letterSpacing: 8, fontSize: 13, color: Colors.white.withOpacity(0.55))),
+          const SizedBox(height: 30),
+          _statChip('BEST', '${r.bestScore}'),
+          const Spacer(flex: 1),
+          _bigButton('PLAY', cyan, () => _start(false)),
+          const SizedBox(height: 14),
+          _bigButton('DAILY  ·  ${_todayBest()}', amber, () => _start(true), filled: false),
+          const SizedBox(height: 14),
+          _bigButton('CHALLENGES   ${r.challengesDone}/${kChallenges.length}',
+              Colors.white, () => setState(() => _showChallenges = true),
+              filled: false, dim: true),
+          const Spacer(flex: 2),
+          Text('tap anywhere to flip · match every bar',
+              style: TextStyle(
+                  fontSize: 12, letterSpacing: 1, color: Colors.white.withOpacity(0.4))),
+        ],
+      ),
+    );
+  }
+
+  Widget _logo() {
+    return Text('VEER',
+        style: TextStyle(
+            fontSize: 82,
+            fontWeight: FontWeight.w900,
+            letterSpacing: 4,
+            color: Colors.white,
+            shadows: [
+              Shadow(color: cyan, blurRadius: 30),
+              Shadow(color: amber.withOpacity(0.5), blurRadius: 50),
+            ]));
+  }
+
+  String _todayBest() {
+    final now = DateTime.now();
