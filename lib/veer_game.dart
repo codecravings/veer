@@ -178,3 +178,83 @@ class VeerGame extends ChangeNotifier {
 
   void tap() {
     if (phase != Phase.play) return;
+    color = 1 - color;
+    pop = 1.6;
+    flipT = 0;
+    flips++;
+  }
+
+  void _fill() {
+    const look = 1700.0;
+    while (spawnCursor < d + look) {
+      spawnCursor += curSpacing;
+      final gap = rng.nextDouble() < curGap;
+      int c = lastColor;
+      if (!gap) {
+        final flip = runLen >= 3 ? true : rng.nextDouble() < 0.5;
+        if (flip) {
+          c = 1 - lastColor;
+          runLen = 0;
+        } else {
+          runLen++;
+        }
+        lastColor = c;
+      }
+      bars.add(Bar(spawnCursor, c, gap));
+    }
+  }
+
+  void _showBanner(String name, String sub) {
+    bannerName = name;
+    bannerSub = sub;
+    bannerT = 0;
+  }
+
+  String _subFor(String z) {
+    switch (z) {
+      case 'RAPIDS': return 'pick up the pace';
+      case 'BLACKOUT': return 'they vanish — read ahead';
+      case 'STORM': return 'hold your focus';
+    }
+    return 'warm up';
+  }
+
+  void _absorb(Bar b) {
+    b.live = false;
+    combo++;
+    if (combo > maxStreak) maxStreak = combo;
+    final mult = multiplier;
+    final last = flipT < 0.16 && !b.gap;
+    score += (b.gap ? 4 : 10) * mult * (last ? 1.5 : 1);
+    pop = math.max(pop, 1.3);
+    bgTint = 0.35;
+    final hue = b.gap ? 210.0 : polarHue(b.color);
+    final sy = camY + (d - b.d);
+    final n = b.gap ? 6 : (last ? 20 : 12);
+    for (var i = 0; i < n; i++) {
+      final a = rng.nextDouble() * math.pi * 2;
+      final sp = _lerp(40, last ? 340 : 200, rng.nextDouble());
+      particles.add(Particle(w / 2, sy, math.cos(a) * sp, math.sin(a) * sp,
+          _lerp(.35, .8, rng.nextDouble()), _lerp(2, last ? 5 : 4, rng.nextDouble()), hue));
+    }
+    if (last) {
+      flash = 0.25;
+      flashHue = hue;
+    }
+  }
+
+  void _die(Bar b) {
+    if (phase != Phase.play) return;
+    phase = Phase.dead;
+    deathT = 0;
+    shake = 26;
+    flash = 1;
+    flashHue = polarHue(b.color);
+    slow = 0.12;
+    combo = 0;
+    final sy = camY + (d - b.d);
+    for (var i = 0; i < 70; i++) {
+      final a = rng.nextDouble() * math.pi * 2;
+      final sp = _lerp(60, 520, rng.nextDouble());
+      particles.add(Particle(w / 2, sy, math.cos(a) * sp, math.sin(a) * sp,
+          _lerp(.5, 1.1, rng.nextDouble()), _lerp(2, 5, rng.nextDouble()),
