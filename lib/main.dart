@@ -288,3 +288,63 @@ class _RootScreenState extends State<RootScreen> with SingleTickerProviderStateM
         ),
       ),
     );
+  }
+
+  // ---------- CHALLENGES ----------
+  Widget _challengesPanel(EdgeInsets pad) {
+    final r = widget.rec;
+    return Container(
+      color: const Color(0xF2070A14),
+      padding: EdgeInsets.fromLTRB(20, pad.top + 24, 20, pad.bottom + 20),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Row(children: [
+            Text('CHALLENGES',
+                style: TextStyle(
+                    fontSize: 26,
+                    fontWeight: FontWeight.w900,
+                    letterSpacing: 3,
+                    color: Colors.white)),
+            const Spacer(),
+            Text('${r.challengesDone}/${kChallenges.length}',
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.w800, color: cyan)),
+          ]),
+          const SizedBox(height: 16),
+          Expanded(
+            child: ListView.separated(
+              itemCount: kChallenges.length,
+              separatorBuilder: (_, __) => const SizedBox(height: 10),
+              itemBuilder: (_, i) => _challengeCard(kChallenges[i], r),
+            ),
+          ),
+          const SizedBox(height: 14),
+          _bigButton('BACK', Colors.white, () => setState(() => _showChallenges = false),
+              filled: false, dim: true),
+        ],
+      ),
+    );
+  }
+
+  Widget _challengeCard(Challenge c, Records r) {
+    final done = c.done(r);
+    final prog = c.progress(r);
+    final cur = c.cur(r);
+    final col = done ? amber : cyan;
+    return Container(
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: Colors.white.withOpacity(0.04),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: col.withOpacity(done ? 0.5 : 0.18), width: 1.2),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(children: [
+            Expanded(
+              child: Text(c.name,
+                  style: const TextStyle(
+                      fontSize: 17, fontWeight: FontWeight.w800, color: Colors.white)),
+            ),
+            if (done)
