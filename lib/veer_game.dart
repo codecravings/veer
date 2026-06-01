@@ -108,3 +108,73 @@ class VeerGame extends ChangeNotifier {
 
   double get _zoneGapMult => zoneName == 'STORM' ? 0.4 : (zoneName == 'STEADY' ? 1.2 : 1);
 
+  double get curSpeed {
+    final base = _lerp(290, 660, _t);
+    final extra = _clamp((_level - 7).toDouble(), 0, 40) * 5;
+    return math.min(base + extra, 800) * _zoneSpdMult;
+  }
+
+  double get curSpacing => math.max(_lerp(330, 165, _t) * _zoneSpcMult, 120);
+  double get curGap => _lerp(0.15, 0.05, _t) * _zoneGapMult;
+
+  // ---- lifecycle ----
+  void startRun({required bool daily}) {
+    this.daily = daily;
+    if (daily) {
+      final now = DateTime.now();
+      dateKey = '${now.year}${now.month.toString().padLeft(2, '0')}${now.day.toString().padLeft(2, '0')}';
+      rng = math.Random(int.parse(dateKey));
+    } else {
+      dateKey = '';
+      rng = math.Random();
+    }
+    d = 0;
+    color = 0;
+    pop = 1;
+    flipT = 99;
+    bars.clear();
+    particles.clear();
+    speed = 300;
+    score = 0;
+    combo = 0;
+    flips = 0;
+    maxStreak = 0;
+    maxRank = 0;
+    timeAlive = 0;
+    shake = 0;
+    slow = 1;
+    flash = 0;
+    deathT = 0;
+    bgTint = 0;
+    bannerT = 99;
+    zoneName = 'STEADY';
+    spawnCursor = d + 360;
+    lastColor = 0;
+    runLen = 0;
+    _fill();
+    _showBanner('STEADY', 'warm up');
+    phase = Phase.play;
+  }
+
+  void goReady() {
+    phase = Phase.ready;
+    // run an attract demo in the background
+    daily = false;
+    rng = math.Random();
+    d = 0;
+    color = 0;
+    bars.clear();
+    particles.clear();
+    score = 0;
+    combo = 0;
+    speed = 300;
+    zoneName = 'STEADY';
+    bannerT = 99;
+    spawnCursor = d + 360;
+    lastColor = 0;
+    runLen = 0;
+    _fill();
+  }
+
+  void tap() {
+    if (phase != Phase.play) return;
