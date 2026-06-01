@@ -118,3 +118,58 @@ class _RootScreenState extends State<RootScreen> with SingleTickerProviderStateM
   }
 
   Widget _overlays(EdgeInsets pad) {
+    if (_showChallenges) return _challengesPanel(pad);
+    switch (game.phase) {
+      case Phase.play:
+        return _playHud(pad);
+      case Phase.dead:
+        return _deathPanel(pad);
+      case Phase.ready:
+        return _homePanel(pad);
+    }
+  }
+
+  // ---------- PLAY HUD ----------
+  Widget _playHud(EdgeInsets pad) {
+    final c = game.color == 0 ? cyan : amber;
+    return IgnorePointer(
+      child: Padding(
+        padding: EdgeInsets.only(top: pad.top + 14),
+        child: Column(
+          children: [
+            Text('${game.score.floor()}',
+                style: const TextStyle(
+                    fontSize: 52, fontWeight: FontWeight.w800, color: Colors.white)),
+            if (game.combo > 1)
+              Text('x${game.multiplier.toStringAsFixed(2)}   ${game.combo} streak',
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700, color: c)),
+            const Spacer(),
+            _banner(),
+            SizedBox(height: 40 + pad.bottom),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _banner() {
+    final t = game.bannerT;
+    if (t > 2.4) return const SizedBox.shrink();
+    final op = t < 0.3 ? t / 0.3 : (t > 1.9 ? (2.4 - t) / 0.5 : 1.0);
+    final c = game.bannerName == 'STORM'
+        ? hsl(0, .8, .62)
+        : game.bannerName == 'BLACKOUT'
+            ? hsl(265, .7, .66)
+            : cyan;
+    return Opacity(
+      opacity: op.clamp(0, 1),
+      child: Column(
+        children: [
+          Text(game.bannerName,
+              style: TextStyle(
+                  fontSize: 40,
+                  fontWeight: FontWeight.w900,
+                  letterSpacing: 6,
+                  color: c,
+                  shadows: [Shadow(color: c, blurRadius: 24)])),
+          Text(game.bannerSub.toUpperCase(),
