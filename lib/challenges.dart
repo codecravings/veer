@@ -53,3 +53,35 @@ class Records {
     await p.setStringList('daily', daily.entries.map((e) => '${e.key}=${e.value}').toList());
   }
 
+  int get challengesDone => kChallenges.where((c) => c.done(this)).length;
+}
+
+/// One long-term goal. `cur`/`goal` drive the progress bar; done when cur>=goal.
+class Challenge {
+  final String name;
+  final String desc;
+  final int goal;
+  final int Function(Records) cur;
+  const Challenge(this.name, this.desc, this.goal, this.cur);
+
+  bool done(Records r) => cur(r) >= goal;
+  double progress(Records r) => (cur(r) / goal).clamp(0.0, 1.0);
+}
+
+const List<Challenge> kChallenges = [
+  Challenge('First Flight', 'Score 100 in a run', 100, _score),
+  Challenge('Warming Up', 'Reach the RAPIDS zone', 1, _rank),
+  Challenge('Quick Hands', 'Flip 30 times in one run', 30, _flips),
+  Challenge('Reader', 'Hit a x10 streak', 10, _streak),
+  Challenge('Into the Dark', 'Reach the BLACKOUT zone', 2, _rank),
+  Challenge('Focused', 'Hit a x25 streak', 25, _streak),
+  Challenge('Eye of the Storm', 'Reach the STORM zone', 3, _rank),
+  Challenge('Marathon', 'Survive 90 seconds', 90, _time),
+  Challenge('Sharpshooter', 'Score 800 in a run', 800, _score),
+];
+
+int _score(Records r) => r.bestScore;
+int _streak(Records r) => r.bestStreak;
+int _flips(Records r) => r.bestFlips;
+int _rank(Records r) => r.maxRank;
+int _time(Records r) => r.bestTime;
