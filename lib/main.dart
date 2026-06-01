@@ -228,3 +228,63 @@ class _RootScreenState extends State<RootScreen> with SingleTickerProviderStateM
 
   String _todayBest() {
     final now = DateTime.now();
+    final key =
+        '${now.year}${now.month.toString().padLeft(2, '0')}${now.day.toString().padLeft(2, '0')}';
+    return '${widget.rec.daily[key] ?? 0}';
+  }
+
+  // ---------- DEATH ----------
+  Widget _deathPanel(EdgeInsets pad) {
+    final r = widget.rec;
+    final s = game.score.floor();
+    final isBest = s >= r.bestScore && s > 0;
+    final a = (game.deathT * 2).clamp(0.0, 1.0);
+    return Opacity(
+      opacity: a,
+      child: Container(
+        color: Colors.black.withOpacity(0.45),
+        padding: EdgeInsets.fromLTRB(28, pad.top + 40, 28, pad.bottom + 28),
+        child: Column(
+          children: [
+            const Spacer(flex: 2),
+            Text('$s',
+                style: TextStyle(
+                    fontSize: 88,
+                    fontWeight: FontWeight.w900,
+                    color: Colors.white,
+                    shadows: [Shadow(color: cyan, blurRadius: 24)])),
+            Text(isBest ? 'NEW BEST!' : 'BEST  ${r.bestScore}',
+                style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.w800,
+                    letterSpacing: 2,
+                    color: isBest ? amber : Colors.white.withOpacity(0.7))),
+            const SizedBox(height: 20),
+            Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+              _miniStat('STREAK', 'x${game.maxStreak}'),
+              const SizedBox(width: 28),
+              _miniStat('ZONE', kZoneOrder[game.maxRank]),
+              const SizedBox(width: 28),
+              _miniStat('TIME', '${game.timeAlive.floor()}s'),
+            ]),
+            if (_newly.isNotEmpty) ...[
+              const SizedBox(height: 22),
+              ..._newly.map((n) => Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 3),
+                    child: Text('✓  $n',
+                        style: TextStyle(
+                            color: amber, fontSize: 15, fontWeight: FontWeight.w700)),
+                  )),
+              Text('CHALLENGE COMPLETE',
+                  style: TextStyle(
+                      fontSize: 11, letterSpacing: 3, color: amber.withOpacity(0.7))),
+            ],
+            const Spacer(flex: 2),
+            _bigButton('RETRY', game.daily ? amber : cyan, () => _start(_lastDaily)),
+            const SizedBox(height: 14),
+            _bigButton('HOME', Colors.white, () => setState(game.goReady),
+                filled: false, dim: true),
+          ],
+        ),
+      ),
+    );
