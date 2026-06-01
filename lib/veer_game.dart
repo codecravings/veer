@@ -258,3 +258,83 @@ class VeerGame extends ChangeNotifier {
       final sp = _lerp(60, 520, rng.nextDouble());
       particles.add(Particle(w / 2, sy, math.cos(a) * sp, math.sin(a) * sp,
           _lerp(.5, 1.1, rng.nextDouble()), _lerp(2, 5, rng.nextDouble()),
+          polarHue(b.color) + _lerp(-20, 20, rng.nextDouble())));
+    }
+    _commit();
+    onDeath?.call();
+  }
+
+  void _commit() {
+    final s = score.floor();
+    rec.totalRuns++;
+    if (s > rec.bestScore) rec.bestScore = s;
+    if (maxStreak > rec.bestStreak) rec.bestStreak = maxStreak;
+    if (flips > rec.bestFlips) rec.bestFlips = flips;
+    if (maxRank > rec.maxRank) rec.maxRank = maxRank;
+    if (timeAlive.floor() > rec.bestTime) rec.bestTime = timeAlive.floor();
+    if (daily) {
+      final cur = rec.daily[dateKey] ?? 0;
+      if (s > cur) rec.daily[dateKey] = s;
+    }
+    rec.save();
+  }
+
+  double get multiplier => 1 + math.min(combo, 60) * 0.05;
+
+  // ---- frame ----
+  void update(double dt) {
+    slow = _lerp(slow, 1, 1 - math.exp(-dt * 4));
+    flash = math.max(0, flash - dt * 3.2);
+    shake = math.max(0, shake - dt * 60);
+    bgTint = math.max(0, bgTint - dt * 1.5);
+    pop = _lerp(pop, 1, 1 - math.exp(-dt * 10));
+    flipT += dt;
+    bannerT += dt;
+    if (phase == Phase.dead) deathT += dt;
+
+    for (final p in particles) {
+      p.x += p.vx * dt;
+      p.y += p.vy * dt;
+      p.vx *= 0.96;
+      p.vy *= 0.96;
+      p.life -= dt / p.max;
+    }
+    particles.removeWhere((p) => p.life <= 0);
+
+    if (phase == Phase.play) {
+      _advance(dt, attract: false);
+    } else if (phase == Phase.ready) {
+      _advance(dt * 0.7, attract: true);
+      if (d > 16000) goReady();
+    }
+
+    notifyListeners();
+  }
+
+  void _advance(double dt, {required bool attract}) {
+    final sdt = dt * slow;
+    speed = curSpeed;
+    d += speed * sdt;
+    if (!attract) timeAlive += dt;
+    _fill();
+
+    // zone change?
+    final z = _zoneFor(d);
+    if (z != zoneName) {
+      zoneName = z;
+      final r = zoneRank(z);
+      if (r > maxRank) maxRank = r;
+      if (!attract) _showBanner(z, _subFor(z));
+    }
+
+    if (attract) {
+      // autopilot: match the next color bar just before it arrives
+      Bar? next;
+      for (final b in bars) {
+        if (b.live && !b.gap && b.d > d) {
+          if (next == null || b.d < next.d) next = b;
+        }
+      }
+      if (next != null && (next.d - d) < speed * 0.22 && color != next.color) {
+        color = next.color;
+        pop = 1.4;
