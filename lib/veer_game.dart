@@ -338,3 +338,155 @@ class VeerGame extends ChangeNotifier {
       if (next != null && (next.d - d) < speed * 0.22 && color != next.color) {
         color = next.color;
         pop = 1.4;
+      }
+    }
+
+    for (final b in bars) {
+      if (b.live && b.d <= d) {
+        if (b.gap || b.color == color) {
+          _absorb(b);
+        } else {
+          b.live = false;
+          _die(b);
+        }
+      }
+    }
+    if (bars.length > 90) bars.removeWhere((b) => b.d < d - 300);
+  }
+}
+
+/// Renders the game field (background, bars, dart, particles). HUD/menus are widgets.
+class VeerPainter extends CustomPainter {
+  VeerPainter(this.g) : super(repaint: g);
+  final VeerGame g;
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    g.w = size.width;
+    g.h = size.height;
+    final w = size.width, h = size.height;
+    final camY = g.camY;
+
+    canvas.save();
+    if (g.shake > 0.1) {
+      canvas.translate((g.rng.nextDouble() * 2 - 1) * g.shake * 0.4,
+          (g.rng.nextDouble() * 2 - 1) * g.shake * 0.4);
+    }
+
+    // background
+    final bg = Paint()
+      ..shader = ui.Gradient.linear(
+          Offset(0, 0), Offset(0, h), [const Color(0xFF070912), const Color(0xFF0A0E1C)]);
+    canvas.drawRect(Rect.fromLTWH(-20, -20, w + 40, h + 40), bg);
+
+    // colour wash from the dart
+    final wash = Paint()
+      ..shader = ui.Gradient.radial(Offset(w / 2, camY), h * 0.9, [
+        _hsl(polarHue(g.color), 0.9, 0.55, 0.10 + g.bgTint * 0.12),
+        const Color(0x00000000),
+      ]);
+    canvas.drawRect(Rect.fromLTWH(0, 0, w, h), wash);
+
+    _drawBars(canvas, w, h, camY);
+    if (g.phase != Phase.dead || g.deathT < 0.22) _drawDart(canvas, w, camY);
+    _drawParticles(canvas);
+
+    canvas.restore();
+
+    if (g.flash > 0.001) {
+      canvas.drawRect(Rect.fromLTWH(0, 0, w, h),
+          Paint()..color = _hsl(g.flashHue, 0.9, 0.7, g.flash * 0.5));
+    }
+    // vignette
+    final vg = Paint()
+      ..shader = ui.Gradient.radial(Offset(w / 2, h / 2), h * 0.78, [
+        const Color(0x00000000),
+        const Color(0x8C000000),
+      ], [0.42, 1.0]);
+    canvas.drawRect(Rect.fromLTWH(0, 0, w, h), vg);
+  }
+
+  void _drawBars(Canvas canvas, double w, double h, double camY) {
+    for (final b in g.bars) {
+      if (!b.live) continue;
+      final sy = camY + (g.d - b.d);
+      if (sy < -40 || sy > h + 40) continue;
+      final ahead = _clamp((b.d - g.d) / 1400, 0, 1);
+      var fade = 1 - ahead * 0.55;
+      if (g.blackout) {
+        final near = _clamp((camY - sy) / 220, 0, 1); // 0 at dart, 1 far up
+        fade *= _lerp(0.05, 1, near);
+      }
+      if (b.gap) {
+        final p = Paint()
+          ..color = _hsl(210, 0.4, 0.7, 0.22 * fade)
+          ..strokeWidth = 3;
+        _dashed(canvas, sy, w, p);
+        continue;
+      }
+      final hue = polarHue(b.color);
+      final th = _lerp(9, 16, 1 - ahead);
+      final glow = Paint()
+        ..color = _hsl(hue, 0.92, 0.6, fade)
+        ..strokeWidth = th
+        ..maskFilter = MaskFilter.blur(BlurStyle.normal, 7 * fade);
+      canvas.drawLine(Offset(0, sy), Offset(w, sy), glow);
+      final core = Paint()
+        ..color = _hsl(hue, 0.92, 0.6, fade)
+        ..strokeWidth = th;
+      canvas.drawLine(Offset(0, sy), Offset(w, sy), core);
+      final hot = Paint()
+        ..color = _hsl(hue, 1, 0.85, 0.7 * fade)
+        ..strokeWidth = 2;
+      canvas.drawLine(Offset(0, sy), Offset(w, sy), hot);
+    }
+  }
+
+  void _dashed(Canvas canvas, double sy, double w, Paint p) {
+    const dash = 6.0, gap = 16.0;
+    double x = 0;
+    while (x < w) {
+      canvas.drawLine(Offset(x, sy), Offset(math.min(x + dash, w), sy), p);
+      x += dash + gap;
+    }
+  }
+
+  void _drawDart(Canvas canvas, double w, double camY) {
+    final hue = polarHue(g.color);
+    final s = g.pop;
+    canvas.save();
+    canvas.translate(w / 2, camY);
+    canvas.scale(s, s);
+    final path = Path()
+      ..moveTo(0, -18)
+      ..lineTo(13, 14)
+      ..lineTo(0, 7)
+      ..lineTo(-13, 14)
+      ..close();
+    canvas.drawPath(
+        path,
+        Paint()
+          ..color = _hsl(hue, 0.95, 0.64)
+          ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 12));
+    canvas.drawPath(path, Paint()..color = _hsl(hue, 0.95, 0.64));
+    canvas.drawCircle(const Offset(0, -3), 3.4, Paint()..color = Colors.white);
+    canvas.restore();
+    canvas.drawCircle(
+        Offset(w / 2, camY),
+        26 * s,
+        Paint()
+          ..color = _hsl(hue, 0.9, 0.6, 0.35)
+          ..style = PaintingStyle.stroke
+          ..strokeWidth = 2);
+  }
+
+  void _drawParticles(Canvas canvas) {
+    for (final p in g.particles) {
+      final a = _clamp(p.life, 0, 1);
+      canvas.drawCircle(Offset(p.x, p.y), p.r * p.life, Paint()..color = _hsl(p.hue, 0.9, 0.65, a));
+    }
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
+}
