@@ -77,7 +77,7 @@ class VeerGame extends ChangeNotifier {
   bool get blackout => zoneName == 'BLACKOUT';
 
   // ---- difficulty curves ----
-  double get _t => _clamp(d / (zlen * 7), 0, 1);
+  double get _t => _clamp(d / (zlen * 8), 0, 1);
   int get _level => (d / zlen).floor();
 
   String _zoneFor(double dist) {
