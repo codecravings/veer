@@ -191,7 +191,7 @@ class VeerGame extends ChangeNotifier {
       final gap = rng.nextDouble() < curGap;
       int c = lastColor;
       if (!gap) {
-        final flip = runLen >= 3 ? true : rng.nextDouble() < 0.5;
+        final flip = runLen >= 2 ? true : rng.nextDouble() < 0.5;
         if (flip) {
           c = 1 - lastColor;
           runLen = 0;
