@@ -286,7 +286,7 @@ class VeerGame extends ChangeNotifier {
     slow = _lerp(slow, 1, 1 - math.exp(-dt * 4));
     flash = math.max(0, flash - dt * 3.2);
     shake = math.max(0, shake - dt * 60);
-    bgTint = math.max(0, bgTint - dt * 1.5);
+    bgTint = math.max(0, bgTint - dt * 1.1);
     pop = _lerp(pop, 1, 1 - math.exp(-dt * 10));
     flipT += dt;
     bannerT += dt;
