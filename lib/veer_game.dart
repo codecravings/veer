@@ -224,7 +224,7 @@ class VeerGame extends ChangeNotifier {
     combo++;
     if (combo > maxStreak) maxStreak = combo;
     final mult = multiplier;
-    final last = flipT < 0.16 && !b.gap;
+    final last = flipT < 0.20 && !b.gap;
     score += (b.gap ? 4 : 10) * mult * (last ? 1.5 : 1);
     pop = math.max(pop, 1.3);
     bgTint = 0.35;
