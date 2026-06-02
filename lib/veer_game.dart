@@ -82,7 +82,7 @@ class VeerGame extends ChangeNotifier {
 
   String _zoneFor(double dist) {
     final li = (dist / zlen).floor();
-    if (li == 0) return 'STEADY';
+    if (dist < zlen * 1.5) return 'STEADY';
     return kZoneOrder[1 + ((li - 1) % 3)];
   }
 
