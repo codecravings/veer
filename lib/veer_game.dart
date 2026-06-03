@@ -249,13 +249,13 @@ class VeerGame extends ChangeNotifier {
     if (phase != Phase.play) return;
     phase = Phase.dead;
     deathT = 0;
-    shake = 26;
+    shake = 32;
     flash = 1;
     flashHue = polarHue(b.color);
     slow = 0.12;
     combo = 0;
     final sy = camY + (d - b.d);
-    for (var i = 0; i < 70; i++) {
+    for (var i = 0; i < 95; i++) {
       final a = rng.nextDouble() * math.pi * 2;
       final sp = _lerp(60, 520, rng.nextDouble());
       particles.add(Particle(w / 2, sy, math.cos(a) * sp, math.sin(a) * sp,
