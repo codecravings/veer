@@ -332,7 +332,11 @@ class VeerGame extends ChangeNotifier {
       zoneName = z;
       final r = zoneRank(z);
       if (r > maxRank) maxRank = r;
-      if (!attract) _showBanner(z, _subFor(z));
+      if (!attract) {
+        _showBanner(z, _subFor(z));
+        flash = 0.3;
+        shake = math.max(shake, 14);
+      }
     }
 
     if (attract) {
