@@ -191,6 +191,50 @@ class _RootScreenState extends State<RootScreen> with SingleTickerProviderStateM
     );
   }
 
+  Widget _levelCard(Level lv, Records r) {
+    final stars = r.levelStars[lv.index] ?? 0;
+    // unlocked if it's level 1 or the previous level has at least 1 star
+    final unlocked = lv.index == 1 || (r.levelStars[lv.index - 1] ?? 0) > 0;
+    final col = stars > 0 ? amber : cyan;
+    return GestureDetector(
+      onTap: unlocked ? () => _startLevel(lv) : null,
+      child: Container(
+        decoration: BoxDecoration(
+          color: Colors.white.withOpacity(unlocked ? 0.04 : 0.015),
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(color: col.withOpacity(unlocked ? 0.3 : 0.08), width: 1.3),
+        ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            if (!unlocked)
+              Icon(Icons.lock, color: Colors.white.withOpacity(0.3), size: 26)
+            else
+              Text('${lv.index}',
+                  style: TextStyle(
+                      fontSize: 30,
+                      fontWeight: FontWeight.w900,
+                      color: Colors.white,
+                      shadows: [Shadow(color: col, blurRadius: 12)])),
+            const SizedBox(height: 6),
+            Text(unlocked ? lv.name : '———',
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                    fontSize: 10,
+                    letterSpacing: 0.5,
+                    color: Colors.white.withOpacity(unlocked ? 0.6 : 0.25))),
+            const SizedBox(height: 6),
+            Text(
+              List.generate(3, (i) => i < stars ? '★' : '☆').join(),
+              style: TextStyle(
+                  fontSize: 13, color: stars > 0 ? amber : Colors.white.withOpacity(0.2)),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   // ---------- PLAY HUD ----------
   Widget _playHud(EdgeInsets pad) {
     final c = game.color == 0 ? cyan : amber;
