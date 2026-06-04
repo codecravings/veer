@@ -154,7 +154,10 @@ class VeerGame extends ChangeNotifier {
     return math.max(_lerp(330, 165, _t) * lvMul * zoneMul, 115);
   }
 
-  double get curGap => _lerp(0.15, 0.05, _t) * _zoneGapMult;
+  double get curGap {
+    if (level != null) return level!.gapChance;
+    return _lerp(0.15, 0.05, _t) * _zoneGapMult;
+  }
 
   // ---- lifecycle ----
   void startRun({required bool daily}) {
