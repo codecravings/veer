@@ -463,6 +463,8 @@ class VeerGame extends ChangeNotifier {
       }
     }
     if (bars.length > 90) bars.removeWhere((b) => b.d < d - 300);
+
+    if (!attract && level != null && d >= level!.distance) _win();
   }
 }
 
