@@ -250,6 +250,13 @@ class VeerGame extends ChangeNotifier {
         }
         runLen++;
         return lastColor;
+      case PatternKind.doubles:
+        // AA BB AA BB
+        if (patStep.isOdd) return lastColor;
+        return 1 - lastColor;
+      case PatternKind.bursts:
+        // tight clusters of alternation, occasional repeat to break rhythm
+        return rng.nextDouble() < 0.2 ? lastColor : 1 - lastColor;
       default:
         return 1 - lastColor;
     }
