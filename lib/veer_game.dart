@@ -3,11 +3,34 @@ import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
 
 import 'challenges.dart';
+import 'cosmetics.dart';
 
 double _lerp(double a, double b, double t) => a + (b - a) * t;
 double _clamp(double v, double a, double b) => v < a ? a : (v > b ? b : v);
 Color _hsl(double h, double s, double l, [double a = 1]) =>
     HSLColor.fromAHSL(a, h % 360, s, l).toColor();
+
+Path _dartPath(int shape) {
+  final p = Path();
+  switch (shape) {
+    case 1: // diamond
+      p..moveTo(0, -17)..lineTo(12, 0)..lineTo(0, 17)..lineTo(-12, 0)..close();
+      break;
+    case 2: // chevron
+      p
+        ..moveTo(0, -18)..lineTo(14, 10)..lineTo(11, 16)..lineTo(0, -4)
+        ..lineTo(-11, 16)..lineTo(-14, 10)..close();
+      break;
+    case 3: // spark
+      p
+        ..moveTo(0, -18)..lineTo(5, -5)..lineTo(16, 0)..lineTo(5, 5)
+        ..lineTo(0, 18)..lineTo(-5, 5)..lineTo(-16, 0)..lineTo(-5, -5)..close();
+      break;
+    default: // 0 arrow
+      p..moveTo(0, -18)..lineTo(13, 14)..lineTo(0, 7)..lineTo(-13, 14)..close();
+  }
+  return p;
+}
 
 const double kCyanHue = 188;
 const double kAmberHue = 34;
@@ -473,12 +496,8 @@ class VeerPainter extends CustomPainter {
     canvas.save();
     canvas.translate(w / 2, camY);
     canvas.scale(s, s);
-    final path = Path()
-      ..moveTo(0, -18)
-      ..lineTo(13, 14)
-      ..lineTo(0, 7)
-      ..lineTo(-13, 14)
-      ..close();
+    final skin = skinById(g.rec.equipped);
+    final path = _dartPath(skin.shape);
     canvas.drawPath(
         path,
         Paint()
