@@ -513,6 +513,16 @@ class VeerPainter extends CustomPainter {
           ..color = _hsl(hue, 0.9, 0.6, 0.35)
           ..style = PaintingStyle.stroke
           ..strokeWidth = 2);
+    if (skin.trail) {
+      final t = _hsl(hue, 0.95, 0.6);
+      canvas.drawRect(
+        Rect.fromLTWH(w / 2 - 7, camY + 6, 14, 120),
+        Paint()
+          ..shader = ui.Gradient.linear(Offset(0, camY + 6), Offset(0, camY + 126),
+              [t.withOpacity(0.45), t.withOpacity(0.0)])
+          ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 6),
+      );
+    }
   }
 
   void _drawParticles(Canvas canvas) {
