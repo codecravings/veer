@@ -3,6 +3,7 @@ import 'package:flutter/scheduler.dart';
 import 'package:flutter/services.dart';
 
 import 'challenges.dart';
+import 'cosmetics.dart';
 import 'veer_game.dart';
 
 Color hsl(double h, double s, double l, [double a = 1]) =>
@@ -49,6 +50,7 @@ class _RootScreenState extends State<RootScreen> with SingleTickerProviderStateM
   Duration _last = Duration.zero;
 
   bool _showChallenges = false;
+  bool _showShop = false;
   bool _lastDaily = false;
   Set<String> _doneSnapshot = {};
   List<String> _newly = [];
@@ -118,6 +120,7 @@ class _RootScreenState extends State<RootScreen> with SingleTickerProviderStateM
   }
 
   Widget _overlays(EdgeInsets pad) {
+    if (_showShop) return _shopPanel(pad);
     if (_showChallenges) return _challengesPanel(pad);
     switch (game.phase) {
       case Phase.play:
@@ -371,6 +374,99 @@ class _RootScreenState extends State<RootScreen> with SingleTickerProviderStateM
             ]),
           ),
         ],
+      ),
+    );
+  }
+
+  // ---------- SHOP ----------
+  Widget _shopPanel(EdgeInsets pad) {
+    final r = widget.rec;
+    return Container(
+      color: const Color(0xF2070A14),
+      padding: EdgeInsets.fromLTRB(20, pad.top + 24, 20, pad.bottom + 20),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Row(children: [
+            const Text('SHOP',
+                style: TextStyle(
+                    fontSize: 26,
+                    fontWeight: FontWeight.w900,
+                    letterSpacing: 3,
+                    color: Colors.white)),
+            const Spacer(),
+            Text('🪙 ${r.coins}',
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.w800, color: amber)),
+          ]),
+          const SizedBox(height: 16),
+          Expanded(
+            child: GridView.count(
+              crossAxisCount: 2,
+              mainAxisSpacing: 12,
+              crossAxisSpacing: 12,
+              childAspectRatio: 0.92,
+              children: kSkins.map((s) => _skinCard(s, r)).toList(),
+            ),
+          ),
+          const SizedBox(height: 14),
+          _bigButton('BACK', Colors.white, () => setState(() => _showShop = false),
+              filled: false, dim: true),
+        ],
+      ),
+    );
+  }
+
+  Widget _skinCard(Skin sk, Records r) {
+    final owned = r.unlocked.contains(sk.id);
+    final equipped = r.equipped == sk.id;
+    final affordable = r.coins >= sk.cost;
+    final col = equipped ? amber : cyan;
+    final glyph = const ['▲', '◆', '⮝', '✦'][sk.shape] + (sk.trail ? ' ☄' : '');
+    return GestureDetector(
+      onTap: () {
+        HapticFeedback.selectionClick();
+        if (owned) {
+          setState(() => r.equipped = sk.id);
+        } else if (affordable) {
+          setState(() {
+            r.coins -= sk.cost;
+            r.unlocked.add(sk.id);
+            r.equipped = sk.id;
+          });
+        }
+        r.save();
+      },
+      child: Container(
+        decoration: BoxDecoration(
+          color: Colors.white.withOpacity(0.04),
+          borderRadius: BorderRadius.circular(18),
+          border: Border.all(color: col.withOpacity(equipped ? 0.7 : 0.18), width: 1.4),
+        ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text(glyph,
+                style: TextStyle(
+                    fontSize: 34, color: cyan, shadows: [Shadow(color: cyan, blurRadius: 16)])),
+            const SizedBox(height: 12),
+            Text(sk.name,
+                style: const TextStyle(
+                    fontSize: 16, fontWeight: FontWeight.w800, color: Colors.white)),
+            const SizedBox(height: 4),
+            Text(
+              equipped ? 'EQUIPPED' : (owned ? 'TAP TO EQUIP' : '🪙 ${sk.cost}'),
+              style: TextStyle(
+                  fontSize: 12,
+                  fontWeight: FontWeight.w700,
+                  letterSpacing: 1,
+                  color: equipped
+                      ? amber
+                      : owned
+                          ? Colors.white.withOpacity(0.6)
+                          : (affordable ? cyan : Colors.white.withOpacity(0.35))),
+            ),
+          ],
+        ),
       ),
     );
   }
