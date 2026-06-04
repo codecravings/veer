@@ -83,6 +83,10 @@ class VeerGame extends ChangeNotifier {
   double spawnCursor = 0;
   int lastColor = 0, runLen = 0;
 
+  // active colour pattern (set by level mode; endless uses mixed)
+  PatternKind pattern = PatternKind.mixed;
+  int patStep = 0;
+
   // scoring
   double score = 0;
   int combo = 0;
