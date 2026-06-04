@@ -73,6 +73,8 @@ class Records {
   }
 
   int get challengesDone => kChallenges.where((c) => c.done(this)).length;
+  int get levelsDone => levelStars.length;
+  int get totalStars => levelStars.values.fold(0, (a, b) => a + b);
 }
 
 Map<int, int> _decodeInts(List<String> raw) {
