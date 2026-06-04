@@ -4,6 +4,7 @@ import 'package:flutter/services.dart';
 
 import 'challenges.dart';
 import 'cosmetics.dart';
+import 'levels.dart';
 import 'veer_game.dart';
 
 Color hsl(double h, double s, double l, [double a = 1]) =>
@@ -51,6 +52,7 @@ class _RootScreenState extends State<RootScreen> with SingleTickerProviderStateM
 
   bool _showChallenges = false;
   bool _showShop = false;
+  bool _showLevels = false;
   bool _lastDaily = false;
   Set<String> _doneSnapshot = {};
   List<String> _newly = [];
