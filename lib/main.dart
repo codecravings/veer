@@ -153,6 +153,44 @@ class _RootScreenState extends State<RootScreen> with SingleTickerProviderStateM
     }
   }
 
+  // ---------- LEVEL SELECT ----------
+  Widget _levelsPanel(EdgeInsets pad) {
+    final r = widget.rec;
+    return Container(
+      color: const Color(0xF2070A14),
+      padding: EdgeInsets.fromLTRB(20, pad.top + 24, 20, pad.bottom + 20),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Row(children: [
+            const Text('LEVELS',
+                style: TextStyle(
+                    fontSize: 26,
+                    fontWeight: FontWeight.w900,
+                    letterSpacing: 3,
+                    color: Colors.white)),
+            const Spacer(),
+            Text('⭐ ${r.totalStars}/${kLevels.length * 3}',
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.w800, color: amber)),
+          ]),
+          const SizedBox(height: 16),
+          Expanded(
+            child: GridView.count(
+              crossAxisCount: 3,
+              mainAxisSpacing: 12,
+              crossAxisSpacing: 12,
+              childAspectRatio: 0.85,
+              children: kLevels.map((l) => _levelCard(l, r)).toList(),
+            ),
+          ),
+          const SizedBox(height: 14),
+          _bigButton('BACK', Colors.white, () => setState(() => _showLevels = false),
+              filled: false, dim: true),
+        ],
+      ),
+    );
+  }
+
   // ---------- PLAY HUD ----------
   Widget _playHud(EdgeInsets pad) {
     final c = game.color == 0 ? cyan : amber;
