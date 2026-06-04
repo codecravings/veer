@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 
 import 'challenges.dart';
 import 'cosmetics.dart';
+import 'levels.dart';
 
 double _lerp(double a, double b, double t) => a + (b - a) * t;
 double _clamp(double v, double a, double b) => v < a ? a : (v > b ? b : v);
@@ -36,7 +37,7 @@ const double kCyanHue = 188;
 const double kAmberHue = 34;
 double polarHue(int c) => c == 0 ? kCyanHue : kAmberHue;
 
-enum Phase { ready, play, dead }
+enum Phase { ready, play, dead, won }
 
 const List<String> kZoneOrder = ['STEADY', 'RAPIDS', 'BLACKOUT', 'STORM'];
 int zoneRank(String n) => kZoneOrder.indexOf(n);
