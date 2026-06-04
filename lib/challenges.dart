@@ -11,6 +11,7 @@ class Records {
   int coins;
   Set<String> unlocked;
   String equipped;
+  Map<int, int> levelStars; // level index -> best stars (1..3)
   Map<String, int> daily; // dateKey -> best score
 
   Records({
@@ -23,8 +24,10 @@ class Records {
     this.coins = 0,
     Set<String>? unlocked,
     this.equipped = 'classic',
+    Map<int, int>? levelStars,
     Map<String, int>? daily,
   })  : unlocked = unlocked ?? {'classic'},
+        levelStars = levelStars ?? {},
         daily = daily ?? {};
 
   static SharedPreferences? _p;
