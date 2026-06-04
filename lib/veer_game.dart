@@ -68,6 +68,7 @@ class VeerGame extends ChangeNotifier {
   double timeAlive = 0;
   String zoneName = 'STEADY';
   bool bestBeaten = false;
+  int coinsEarned = 0;
 
   // fx
   double speed = 300, shake = 0, slow = 1, flash = 0, flashHue = 190, deathT = 0, bgTint = 0;
@@ -153,6 +154,7 @@ class VeerGame extends ChangeNotifier {
     lastColor = 0;
     runLen = 0;
     bestBeaten = false;
+    coinsEarned = 0;
     _fill();
     _showBanner('STEADY', 'warm up');
     phase = Phase.play;
@@ -278,6 +280,8 @@ class VeerGame extends ChangeNotifier {
       final cur = rec.daily[dateKey] ?? 0;
       if (s > cur) rec.daily[dateKey] = s;
     }
+    coinsEarned = (s / 12).floor() + maxRank * 8;
+    rec.coins += coinsEarned;
     rec.save();
   }
 
