@@ -194,6 +194,15 @@ class VeerGame extends ChangeNotifier {
     phase = Phase.play;
   }
 
+  void startLevel(Level lv) {
+    startRun(daily: false);
+    level = lv;
+    pattern = lv.pattern;
+    patStep = 0;
+    starsEarned = 0;
+    _showBanner('LEVEL ${lv.index}', lv.name);
+  }
+
   void goReady() {
     phase = Phase.ready;
     // run an attract demo in the background
