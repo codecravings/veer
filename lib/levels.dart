@@ -36,4 +36,14 @@ const List<Level> kLevels = [
   Level(6, 'Read Ahead', PatternKind.runs, 1.00, 0.95, 0.07, _seg * 1.8, 320, 520),
   Level(7, 'Scatter', PatternKind.random, 0.95, 1.00, 0.09, _seg * 1.8, 340, 560),
   Level(8, 'Bursts', PatternKind.bursts, 1.05, 0.92, 0.10, _seg * 2.0, 400, 640),
+  Level(9, 'Crosswind', PatternKind.mixed, 1.08, 0.88, 0.06, _seg * 2.0, 440, 700),
+  Level(10, 'Doubletime', PatternKind.doubles, 1.18, 0.82, 0.05, _seg * 2.2, 500, 780),
+  Level(11, 'Whiteout', PatternKind.runs, 1.15, 0.85, 0.05, _seg * 2.2, 540, 840),
+  Level(12, 'Storm Front', PatternKind.bursts, 1.22, 0.78, 0.06, _seg * 2.4, 600, 920),
+  Level(13, 'Chaos', PatternKind.random, 1.20, 0.80, 0.05, _seg * 2.4, 640, 980),
+  Level(14, 'Overdrive', PatternKind.mixed, 1.30, 0.74, 0.04, _seg * 2.6, 720, 1080),
+  Level(15, 'Apex', PatternKind.mixed, 1.40, 0.70, 0.03, _seg * 2.8, 820, 1240),
 ];
+
+Level levelByIndex(int i) =>
+    kLevels.firstWhere((l) => l.index == i, orElse: () => kLevels.first);
