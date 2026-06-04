@@ -8,6 +8,9 @@ class Records {
   int maxRank; // furthest zone rank reached: STEADY0 RAPIDS1 BLACKOUT2 STORM3
   int bestTime; // seconds survived
   int totalRuns;
+  int coins;
+  Set<String> unlocked;
+  String equipped;
   Map<String, int> daily; // dateKey -> best score
 
   Records({
@@ -17,8 +20,12 @@ class Records {
     this.maxRank = 0,
     this.bestTime = 0,
     this.totalRuns = 0,
+    this.coins = 0,
+    Set<String>? unlocked,
+    this.equipped = 'classic',
     Map<String, int>? daily,
-  }) : daily = daily ?? {};
+  })  : unlocked = unlocked ?? {'classic'},
+        daily = daily ?? {};
 
   static SharedPreferences? _p;
 
@@ -37,6 +44,9 @@ class Records {
       maxRank: p.getInt('maxRank') ?? 0,
       bestTime: p.getInt('bestTime') ?? 0,
       totalRuns: p.getInt('totalRuns') ?? 0,
+      coins: p.getInt('coins') ?? 0,
+      unlocked: (p.getStringList('unlocked') ?? ['classic']).toSet(),
+      equipped: p.getString('equipped') ?? 'classic',
       daily: daily,
     );
   }
@@ -50,6 +60,9 @@ class Records {
     await p.setInt('maxRank', maxRank);
     await p.setInt('bestTime', bestTime);
     await p.setInt('totalRuns', totalRuns);
+    await p.setInt('coins', coins);
+    await p.setStringList('unlocked', unlocked.toList());
+    await p.setString('equipped', equipped);
     await p.setStringList('daily', daily.entries.map((e) => '${e.key}=${e.value}').toList());
   }
 
