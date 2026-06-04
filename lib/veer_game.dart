@@ -153,6 +153,7 @@ class VeerGame extends ChangeNotifier {
   // ---- lifecycle ----
   void startRun({required bool daily}) {
     this.daily = daily;
+    level = null;
     if (daily) {
       final now = DateTime.now();
       dateKey = '${now.year}${now.month.toString().padLeft(2, '0')}${now.day.toString().padLeft(2, '0')}';
@@ -186,6 +187,8 @@ class VeerGame extends ChangeNotifier {
     runLen = 0;
     bestBeaten = false;
     coinsEarned = 0;
+    pattern = PatternKind.mixed;
+    patStep = 0;
     _fill();
     _showBanner('STEADY', 'warm up');
     phase = Phase.play;
@@ -208,6 +211,8 @@ class VeerGame extends ChangeNotifier {
     spawnCursor = d + 360;
     lastColor = 0;
     runLen = 0;
+    pattern = PatternKind.mixed;
+    patStep = 0;
     _fill();
   }
 
