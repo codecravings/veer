@@ -139,12 +139,15 @@ class _RootScreenState extends State<RootScreen> with SingleTickerProviderStateM
 
   Widget _overlays(EdgeInsets pad) {
     if (_showShop) return _shopPanel(pad);
+    if (_showLevels) return _levelsPanel(pad);
     if (_showChallenges) return _challengesPanel(pad);
     switch (game.phase) {
       case Phase.play:
         return _playHud(pad);
       case Phase.dead:
         return _deathPanel(pad);
+      case Phase.won:
+        return _winPanel(pad);
       case Phase.ready:
         return _homePanel(pad);
     }
