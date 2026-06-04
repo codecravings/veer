@@ -236,6 +236,25 @@ class VeerGame extends ChangeNotifier {
     }
   }
 
+  /// Picks the next bar colour according to the active [pattern]. This is the
+  /// heart of "different levels feel different".
+  int _nextColor() {
+    switch (pattern) {
+      case PatternKind.alternate:
+        return 1 - lastColor;
+      case PatternKind.runs:
+        // long same-colour runs, then flip — trains tap inhibition
+        if (runLen >= 3 + rng.nextInt(3)) {
+          runLen = 0;
+          return 1 - lastColor;
+        }
+        runLen++;
+        return lastColor;
+      default:
+        return 1 - lastColor;
+    }
+  }
+
   void _showBanner(String name, String sub) {
     bannerName = name;
     bannerSub = sub;
