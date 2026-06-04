@@ -60,7 +60,9 @@ class _RootScreenState extends State<RootScreen> with SingleTickerProviderStateM
   @override
   void initState() {
     super.initState();
-    game = VeerGame(widget.rec)..onDeath = _onDeath;
+    game = VeerGame(widget.rec)
+      ..onDeath = _onDeath
+      ..onWin = _onWin;
     game.goReady();
     _ticker = createTicker(_tick)..start();
   }
@@ -85,6 +87,20 @@ class _RootScreenState extends State<RootScreen> with SingleTickerProviderStateM
     setState(() => _showChallenges = false);
     HapticFeedback.mediumImpact();
     game.startRun(daily: daily);
+  }
+
+  void _onWin() {
+    HapticFeedback.mediumImpact();
+    setState(() {});
+  }
+
+  void _startLevel(Level lv) {
+    setState(() {
+      _showLevels = false;
+      _newly = [];
+    });
+    HapticFeedback.mediumImpact();
+    game.startLevel(lv);
   }
 
   void _flip() {
