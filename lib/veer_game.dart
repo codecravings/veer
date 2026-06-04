@@ -144,7 +144,8 @@ class VeerGame extends ChangeNotifier {
   double get curSpeed {
     final base = _lerp(290, 660, _t);
     final extra = _clamp((_level - 7).toDouble(), 0, 40) * 5;
-    return math.min(base + extra, 800) * _zoneSpdMult;
+    final lvMul = level?.speedMul ?? 1.0;
+    return math.min((base + extra) * lvMul, 820) * (level != null ? 1.0 : _zoneSpdMult);
   }
 
   double get curSpacing => math.max(_lerp(330, 165, _t) * _zoneSpcMult, 120);
