@@ -198,7 +198,11 @@ class _RootScreenState extends State<RootScreen> with SingleTickerProviderStateM
               style: TextStyle(
                   letterSpacing: 8, fontSize: 13, color: Colors.white.withOpacity(0.55))),
           const SizedBox(height: 30),
-          _statChip('BEST', '${r.bestScore}'),
+          Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+            _statChip('BEST', '${r.bestScore}'),
+            const SizedBox(width: 44),
+            _statChip('COINS', '${r.coins}'),
+          ]),
           const Spacer(flex: 1),
           _bigButton('PLAY', cyan, () => _start(false)),
           const SizedBox(height: 14),
@@ -207,6 +211,9 @@ class _RootScreenState extends State<RootScreen> with SingleTickerProviderStateM
           _bigButton('CHALLENGES   ${r.challengesDone}/${kChallenges.length}',
               Colors.white, () => setState(() => _showChallenges = true),
               filled: false, dim: true),
+          const SizedBox(height: 14),
+          _bigButton('SHOP   🪙 ${r.coins}', amber, () => setState(() => _showShop = true),
+              filled: false),
           const Spacer(flex: 2),
           Text('tap anywhere to flip · match every bar',
               style: TextStyle(
