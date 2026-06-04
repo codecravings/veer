@@ -67,6 +67,8 @@ class Records {
     await p.setInt('coins', coins);
     await p.setStringList('unlocked', unlocked.toList());
     await p.setString('equipped', equipped);
+    await p.setStringList(
+        'levelStars', levelStars.entries.map((e) => '${e.key}=${e.value}').toList());
     await p.setStringList('daily', daily.entries.map((e) => '${e.key}=${e.value}').toList());
   }
 
