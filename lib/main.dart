@@ -277,6 +277,9 @@ class _RootScreenState extends State<RootScreen> with SingleTickerProviderStateM
               const SizedBox(width: 28),
               _miniStat('TIME', '${game.timeAlive.floor()}s'),
             ]),
+            const SizedBox(height: 14),
+            Text('🪙  +${game.coinsEarned}',
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.w800, color: amber)),
             if (_newly.isNotEmpty) ...[
               const SizedBox(height: 22),
               ..._newly.map((n) => Padding(
