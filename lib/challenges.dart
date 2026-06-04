@@ -50,6 +50,7 @@ class Records {
       coins: p.getInt('coins') ?? 0,
       unlocked: (p.getStringList('unlocked') ?? ['classic']).toSet(),
       equipped: p.getString('equipped') ?? 'classic',
+      levelStars: _decodeInts(p.getStringList('levelStars') ?? []),
       daily: daily,
     );
   }
@@ -70,6 +71,19 @@ class Records {
   }
 
   int get challengesDone => kChallenges.where((c) => c.done(this)).length;
+}
+
+Map<int, int> _decodeInts(List<String> raw) {
+  final m = <int, int>{};
+  for (final e in raw) {
+    final i = e.indexOf('=');
+    if (i > 0) {
+      final k = int.tryParse(e.substring(0, i));
+      final v = int.tryParse(e.substring(i + 1));
+      if (k != null && v != null) m[k] = v;
+    }
+  }
+  return m;
 }
 
 /// One long-term goal. `cur`/`goal` drive the progress bar; done when cur>=goal.
