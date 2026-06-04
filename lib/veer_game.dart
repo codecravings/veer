@@ -203,6 +203,24 @@ class VeerGame extends ChangeNotifier {
     _showBanner('LEVEL ${lv.index}', lv.name);
   }
 
+  void _win() {
+    if (phase != Phase.play) return;
+    phase = Phase.won;
+    deathT = 0;
+    flash = 0.5;
+    flashHue = 50;
+    final lv = level!;
+    final s = score.floor();
+    starsEarned = 1 + (s >= lv.star2 ? 1 : 0) + (s >= lv.star3 ? 1 : 0);
+    coinsEarned = (s / 12).floor() + lv.index * 10 + starsEarned * 25;
+    rec.coins += coinsEarned;
+    final prev = rec.levelStars[lv.index] ?? 0;
+    if (starsEarned > prev) rec.levelStars[lv.index] = starsEarned;
+    if (s > rec.bestScore) rec.bestScore = s;
+    rec.save();
+    onWin?.call();
+  }
+
   void goReady() {
     phase = Phase.ready;
     // run an attract demo in the background
