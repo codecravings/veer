@@ -148,7 +148,12 @@ class VeerGame extends ChangeNotifier {
     return math.min((base + extra) * lvMul, 820) * (level != null ? 1.0 : _zoneSpdMult);
   }
 
-  double get curSpacing => math.max(_lerp(330, 165, _t) * _zoneSpcMult, 120);
+  double get curSpacing {
+    final lvMul = level?.spacingMul ?? 1.0;
+    final zoneMul = level != null ? 1.0 : _zoneSpcMult;
+    return math.max(_lerp(330, 165, _t) * lvMul * zoneMul, 115);
+  }
+
   double get curGap => _lerp(0.15, 0.05, _t) * _zoneGapMult;
 
   // ---- lifecycle ----
