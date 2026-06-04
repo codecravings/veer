@@ -70,6 +70,9 @@ class VeerGame extends ChangeNotifier {
 
   Phase phase = Phase.ready;
   bool daily = false;
+  Level? level; // non-null while playing a level
+  int starsEarned = 0;
+  void Function()? onWin;
   String dateKey = '';
   math.Random rng = math.Random();
 
