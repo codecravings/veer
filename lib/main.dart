@@ -406,6 +406,66 @@ class _RootScreenState extends State<RootScreen> with SingleTickerProviderStateM
     );
   }
 
+  // ---------- WIN ----------
+  Widget _winPanel(EdgeInsets pad) {
+    final lv = game.level;
+    final s = game.score.floor();
+    final a = (game.deathT * 2).clamp(0.0, 1.0);
+    final stars = game.starsEarned;
+    final nextLv = lv == null || lv.index >= kLevels.length ? null : levelByIndex(lv.index + 1);
+    return Opacity(
+      opacity: a,
+      child: Container(
+        color: Colors.black.withOpacity(0.5),
+        padding: EdgeInsets.fromLTRB(28, pad.top + 40, 28, pad.bottom + 28),
+        child: Column(
+          children: [
+            const Spacer(flex: 2),
+            Text('LEVEL ${lv?.index ?? ''}',
+                style: TextStyle(
+                    fontSize: 18, letterSpacing: 4, color: Colors.white.withOpacity(0.6))),
+            Text('CLEARED',
+                style: TextStyle(
+                    fontSize: 44,
+                    fontWeight: FontWeight.w900,
+                    letterSpacing: 4,
+                    color: amber,
+                    shadows: [Shadow(color: amber, blurRadius: 26)])),
+            const SizedBox(height: 18),
+            Text(
+              List.generate(3, (i) => i < stars ? '★' : '☆').join(' '),
+              style: TextStyle(
+                  fontSize: 46,
+                  color: amber,
+                  shadows: [Shadow(color: amber.withOpacity(0.7), blurRadius: 18)]),
+            ),
+            const SizedBox(height: 18),
+            Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+              _miniStat('SCORE', '$s'),
+              const SizedBox(width: 28),
+              _miniStat('STREAK', 'x${game.maxStreak}'),
+              const SizedBox(width: 28),
+              _miniStat('COINS', '+${game.coinsEarned}'),
+            ]),
+            const Spacer(flex: 2),
+            if (nextLv != null)
+              _bigButton('NEXT  ·  ${nextLv.name}', cyan, () => _startLevel(nextLv))
+            else
+              _bigButton('ALL CLEAR!', amber, () => setState(() => _showLevels = true),
+                  filled: false),
+            const SizedBox(height: 14),
+            _bigButton('LEVELS', Colors.white, () {
+              setState(() {
+                _showLevels = true;
+                game.goReady();
+              });
+            }, filled: false, dim: true),
+          ],
+        ),
+      ),
+    );
+  }
+
   // ---------- CHALLENGES ----------
   Widget _challengesPanel(EdgeInsets pad) {
     final r = widget.rec;
